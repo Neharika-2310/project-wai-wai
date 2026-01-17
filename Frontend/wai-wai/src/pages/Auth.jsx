@@ -1,21 +1,27 @@
+"use client";
+
 import React, { useState } from "react";
-import { useAuth } from "../context/AuthContext";
-import { useNavigate } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
+import { useNavigate } from "react-router-dom";
+import { useAuth } from "../context/AuthContext";
 import {
-  FiMail,
-  FiLock,
-  FiBriefcase,
-  FiUser,
-  FiAlertCircle,
-  FiEye,
-  FiEyeOff,
-} from "react-icons/fi";
+  Briefcase,
+  User,
+  AlertCircle,
+  Eye,
+  EyeOff,
+  Sparkles,
+  Target,
+  Zap,
+  Search,
+  FileText,
+  Users,
+} from "lucide-react";
+import "../styles/Auth.css";
 
 const Auth = () => {
   const { login, register } = useAuth();
   const navigate = useNavigate();
-
   const [isLogin, setIsLogin] = useState(true);
   const [userRole, setUserRole] = useState("employer");
   const [email, setEmail] = useState("");
@@ -31,148 +37,287 @@ const Auth = () => {
 
     try {
       if (isLogin) {
-        const { user } = await login(email, password);
-        const actualRole = user.user_metadata?.role;
+        const { data } = await login(email, password);
+        const authedUser = data?.user || data?.session?.user;
+        const actualRole = authedUser?.user_metadata?.role;
 
         if (actualRole && actualRole !== userRole) {
           throw new Error(
-            `Access Denied: You are registered as a ${actualRole}. Please switch tabs.`,
+            `Access denied: you are registered as ${actualRole}. Switch to the correct tab.`,
           );
         }
 
-        if (userRole === "employer") {
+        if (actualRole === "employer" || userRole === "employer") {
           navigate("/generate-job");
         } else {
           navigate("/");
         }
       } else {
         await register(email, password, userRole);
-        alert(
-          "Registration successful! Please check your email for verification.",
-        );
         setIsLogin(true);
       }
     } catch (err) {
-      setError(err.message);
+      setError(err?.message || "Authentication failed. Please try again.");
     } finally {
       setLoading(false);
     }
   };
 
+  const roleContent = {
+    employer: {
+      icon: Briefcase,
+      title: "Wevolve AI",
+      subtitle:
+        "Transform your hiring process with AI-powered job descriptions",
+      features: [
+        { icon: Sparkles, text: "AI-Powered Generation" },
+        { icon: Target, text: "ATS-Optimized" },
+        { icon: Zap, text: "Save Time & Effort" },
+      ],
+      gradient: "linear-gradient(135deg, #0ea5e9 0%, #6366f1 100%)",
+      accentColor: "#0ea5e9",
+    },
+    candidate: {
+      icon: User,
+      title: "Wevolve AI",
+      subtitle: "Find your dream job with AI-powered career matching",
+      features: [
+        { icon: Search, text: "Smart Job Matching" },
+        { icon: FileText, text: "Resume Optimization" },
+        { icon: Users, text: "Connect with Employers" },
+      ],
+      gradient: "linear-gradient(135deg, #10b981 0%, #0ea5e9 100%)",
+      accentColor: "#10b981",
+    },
+  };
+
+  const currentRole = roleContent[userRole];
+  const RoleIcon = currentRole.icon;
+
+  // Floating particles for background
+  const particles = Array.from({ length: 6 }, (_, i) => i);
+
   return (
-    <div style={styles.container}>
-      <div style={styles.wrapper}>
-        {/* Left Side - Branding */}
+    <div className="auth-container">
+      <div className="auth-wrapper">
+        {/* Left Side - Branding with Role-based Animation */}
         <motion.div
-          style={styles.brandingSide}
+          className="auth-branding-side"
           initial={{ opacity: 0, x: -50 }}
-          animate={{ opacity: 1, x: 0 }}
+          animate={{
+            opacity: 1,
+            x: 0,
+            background: currentRole.gradient,
+          }}
           transition={{ duration: 0.6 }}
         >
-          <div style={styles.brandingContent}>
-            <motion.div
-              style={styles.logoSection}
-              initial={{ scale: 0.8, opacity: 0 }}
-              animate={{ scale: 1, opacity: 1 }}
-              transition={{ duration: 0.5, delay: 0.2 }}
-            >
-              <div style={styles.largeLogo}>
-                <FiBriefcase />
-              </div>
-              <h2 style={styles.brandTitle}>Wevolve AI</h2>
-            </motion.div>
+          {/* Animated Background Particles */}
+          <div className="auth-particles">
+            {particles.map((i) => (
+              <motion.div
+                key={i}
+                className="auth-particle"
+                animate={{
+                  y: [0, -30, 0],
+                  x: [0, Math.sin(i) * 20, 0],
+                  opacity: [0.3, 0.6, 0.3],
+                  scale: [1, 1.2, 1],
+                }}
+                transition={{
+                  duration: 3 + i * 0.5,
+                  repeat: Number.POSITIVE_INFINITY,
+                  delay: i * 0.3,
+                  ease: "easeInOut",
+                }}
+                style={{
+                  left: `${15 + i * 15}%`,
+                  top: `${20 + (i % 3) * 25}%`,
+                }}
+              />
+            ))}
+          </div>
 
-            <motion.p
-              style={styles.brandSubtitle}
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              transition={{ duration: 0.5, delay: 0.4 }}
-            >
-              Transform your hiring process with AI-powered job descriptions
-            </motion.p>
-
-            <motion.div
-              style={styles.features}
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              transition={{ duration: 0.5, delay: 0.6 }}
-            >
-              {[
-                "AI-Powered Generation",
-                "ATS-Optimized",
-                "Save Time & Effort",
-              ].map((feature, index) => (
+          <div className="auth-branding-content">
+            <AnimatePresence mode="wait">
+              <motion.div
+                key={userRole}
+                className="auth-logo-section"
+                initial={{ scale: 0.8, opacity: 0, rotateY: -90 }}
+                animate={{ scale: 1, opacity: 1, rotateY: 0 }}
+                exit={{ scale: 0.8, opacity: 0, rotateY: 90 }}
+                transition={{ duration: 0.5, type: "spring", stiffness: 100 }}
+              >
                 <motion.div
-                  key={index}
-                  style={styles.featureItem}
-                  initial={{ x: -20, opacity: 0 }}
-                  animate={{ x: 0, opacity: 1 }}
-                  transition={{ duration: 0.4, delay: 0.7 + index * 0.1 }}
+                  className="auth-large-logo"
+                  animate={{
+                    boxShadow: [
+                      "0 0 20px rgba(255,255,255,0.2)",
+                      "0 0 40px rgba(255,255,255,0.4)",
+                      "0 0 20px rgba(255,255,255,0.2)",
+                    ],
+                  }}
+                  transition={{ duration: 2, repeat: Number.POSITIVE_INFINITY }}
                 >
-                  <div style={styles.checkIcon}>✓</div>
-                  <span>{feature}</span>
+                  <motion.div
+                    animate={{ rotate: userRole === "employer" ? 0 : 360 }}
+                    transition={{ duration: 0.6, type: "spring" }}
+                  >
+                    <RoleIcon size={48} />
+                  </motion.div>
                 </motion.div>
-              ))}
+                <h2 className="auth-brand-title">{currentRole.title}</h2>
+              </motion.div>
+            </AnimatePresence>
+
+            <AnimatePresence mode="wait">
+              <motion.p
+                key={`subtitle-${userRole}`}
+                className="auth-brand-subtitle"
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                exit={{ opacity: 0, y: -20 }}
+                transition={{ duration: 0.4 }}
+              >
+                {currentRole.subtitle}
+              </motion.p>
+            </AnimatePresence>
+
+            <motion.div className="auth-features">
+              <AnimatePresence mode="wait">
+                <motion.div
+                  key={`features-${userRole}`}
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: 1 }}
+                  exit={{ opacity: 0 }}
+                  transition={{ duration: 0.3 }}
+                >
+                  {currentRole.features.map((feature, index) => {
+                    const FeatureIcon = feature.icon;
+                    return (
+                      <motion.div
+                        key={index}
+                        className="auth-feature-item"
+                        initial={{ x: -30, opacity: 0 }}
+                        animate={{ x: 0, opacity: 1 }}
+                        transition={{
+                          duration: 0.4,
+                          delay: 0.1 + index * 0.1,
+                          type: "spring",
+                          stiffness: 100,
+                        }}
+                      >
+                        <motion.div
+                          className="auth-feature-icon-wrapper"
+                          whileHover={{ scale: 1.2, rotate: 10 }}
+                          transition={{ type: "spring", stiffness: 300 }}
+                        >
+                          <FeatureIcon size={20} />
+                        </motion.div>
+                        <span>{feature.text}</span>
+                      </motion.div>
+                    );
+                  })}
+                </motion.div>
+              </AnimatePresence>
             </motion.div>
           </div>
         </motion.div>
 
         {/* Right Side - Form */}
         <motion.div
-          style={styles.formSide}
+          className="auth-form-side"
           initial={{ opacity: 0, x: 50 }}
           animate={{ opacity: 1, x: 0 }}
           transition={{ duration: 0.6 }}
         >
-          <div style={styles.formContainer}>
-            <motion.h2
-              style={styles.formTitle}
-              initial={{ y: -20, opacity: 0 }}
-              animate={{ y: 0, opacity: 1 }}
-              transition={{ duration: 0.5, delay: 0.3 }}
-            >
-              {isLogin ? "Welcome Back!" : "Create Account"}
-            </motion.h2>
+          <div className="auth-form-container">
+            <AnimatePresence mode="wait">
+              <motion.h2
+                key={`heading-${isLogin}`}
+                className="auth-heading"
+                initial={{ y: -20, opacity: 0 }}
+                animate={{ y: 0, opacity: 1 }}
+                exit={{ y: 20, opacity: 0 }}
+                transition={{ duration: 0.3 }}
+              >
+                {isLogin ? "Welcome Back!" : "Create Account"}
+              </motion.h2>
+            </AnimatePresence>
 
-            <motion.p
-              style={styles.formSubtitle}
-              initial={{ y: -20, opacity: 0 }}
-              animate={{ y: 0, opacity: 1 }}
-              transition={{ duration: 0.5, delay: 0.4 }}
-            >
-              {isLogin ? "Sign in to continue" : "Get started with Wevolve AI"}
-            </motion.p>
+            <AnimatePresence mode="wait">
+              <motion.p
+                key={`subheading-${isLogin}`}
+                className="auth-subheading"
+                initial={{ y: -20, opacity: 0 }}
+                animate={{ y: 0, opacity: 1 }}
+                exit={{ y: 20, opacity: 0 }}
+                transition={{ duration: 0.3, delay: 0.1 }}
+              >
+                {isLogin
+                  ? "Sign in to continue"
+                  : "Get started with Wevolve AI"}
+              </motion.p>
+            </AnimatePresence>
 
-            {/* Role Tabs */}
+            {/* Role Tabs with Sliding Indicator */}
             <motion.div
-              style={styles.tabContainer}
+              className="auth-role-selector"
               initial={{ y: -20, opacity: 0 }}
               animate={{ y: 0, opacity: 1 }}
-              transition={{ duration: 0.5, delay: 0.5 }}
+              transition={{ duration: 0.5, delay: 0.2 }}
             >
-              <motion.button
-                style={{
-                  ...styles.tab,
-                  ...(userRole === "employer" ? styles.activeTab : {}),
+              {/* Sliding Background Indicator */}
+              <motion.div
+                className="auth-role-indicator"
+                layout
+                animate={{
+                  x: userRole === "employer" ? 0 : "100%",
+                  background:
+                    userRole === "employer"
+                      ? "linear-gradient(135deg, #0ea5e9 0%, #6366f1 100%)"
+                      : "linear-gradient(135deg, #10b981 0%, #0ea5e9 100%)",
                 }}
+                transition={{
+                  type: "spring",
+                  stiffness: 300,
+                  damping: 30,
+                }}
+              />
+
+              <motion.button
+                className={`auth-role-btn ${userRole === "employer" ? "auth-role-btn-active" : ""}`}
                 onClick={() => setUserRole("employer")}
                 whileHover={{ scale: 1.02 }}
                 whileTap={{ scale: 0.98 }}
               >
-                <FiBriefcase style={styles.tabIcon} />
-                Employer
+                <motion.div
+                  animate={{
+                    rotate: userRole === "employer" ? [0, -10, 10, 0] : 0,
+                    scale: userRole === "employer" ? [1, 1.2, 1] : 1,
+                  }}
+                  transition={{ duration: 0.5 }}
+                >
+                  <Briefcase className="auth-role-icon" size={18} />
+                </motion.div>
+                <span>Employer</span>
               </motion.button>
+
               <motion.button
-                style={{
-                  ...styles.tab,
-                  ...(userRole === "candidate" ? styles.activeTab : {}),
-                }}
+                className={`auth-role-btn ${userRole === "candidate" ? "auth-role-btn-active" : ""}`}
                 onClick={() => setUserRole("candidate")}
                 whileHover={{ scale: 1.02 }}
                 whileTap={{ scale: 0.98 }}
               >
-                <FiUser style={styles.tabIcon} />
-                Job Seeker
+                <motion.div
+                  animate={{
+                    rotate: userRole === "candidate" ? [0, -10, 10, 0] : 0,
+                    scale: userRole === "candidate" ? [1, 1.2, 1] : 1,
+                  }}
+                  transition={{ duration: 0.5 }}
+                >
+                  <User className="auth-role-icon" size={18} />
+                </motion.div>
+                <span>Job Seeker</span>
               </motion.button>
             </motion.div>
 
@@ -180,106 +325,137 @@ const Auth = () => {
             <AnimatePresence>
               {error && (
                 <motion.div
-                  style={styles.errorBox}
-                  initial={{ opacity: 0, y: -10 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  exit={{ opacity: 0, y: -10 }}
+                  className="auth-error-box"
+                  initial={{ opacity: 0, y: -10, scale: 0.95 }}
+                  animate={{ opacity: 1, y: 0, scale: 1 }}
+                  exit={{ opacity: 0, y: -10, scale: 0.95 }}
                 >
-                  <FiAlertCircle style={styles.errorIcon} />
+                  <AlertCircle className="auth-error-icon" size={20} />
                   {error}
                 </motion.div>
               )}
             </AnimatePresence>
 
             {/* Form */}
-            <form onSubmit={handleSubmit} style={styles.form}>
+            <form onSubmit={handleSubmit} className="auth-form">
               <motion.div
-                style={styles.inputGroup}
+                className="auth-input-group"
                 initial={{ x: -20, opacity: 0 }}
                 animate={{ x: 0, opacity: 1 }}
-                transition={{ duration: 0.4, delay: 0.6 }}
+                transition={{ duration: 0.4, delay: 0.3 }}
               >
-                <label style={styles.label}>Email Address</label>
-                <div style={styles.inputWrapper}>
-                  <FiMail style={styles.inputIcon} />
+                <label className="auth-label">Email Address</label>
+                <motion.div
+                  className="auth-input-wrapper"
+                  whileFocus={{ scale: 1.01 }}
+                >
                   <input
                     type="email"
                     value={email}
                     onChange={(e) => setEmail(e.target.value)}
                     required
-                    style={styles.input}
+                    className="auth-input"
                     placeholder="name@company.com"
                   />
-                </div>
+                </motion.div>
               </motion.div>
 
               <motion.div
-                style={styles.inputGroup}
+                className="auth-input-group"
                 initial={{ x: -20, opacity: 0 }}
                 animate={{ x: 0, opacity: 1 }}
-                transition={{ duration: 0.4, delay: 0.7 }}
+                transition={{ duration: 0.4, delay: 0.4 }}
               >
-                <label style={styles.label}>Password</label>
-                <div style={styles.inputWrapper}>
-                  <FiLock style={styles.inputIcon} />
+                <label className="auth-label">Password</label>
+                <div className="auth-input-wrapper">
                   <input
                     type={showPassword ? "text" : "password"}
                     value={password}
                     onChange={(e) => setPassword(e.target.value)}
                     required
-                    style={styles.input}
+                    className="auth-input"
                     placeholder="••••••••"
                   />
-                  <button
+                  <motion.button
                     type="button"
                     onClick={() => setShowPassword(!showPassword)}
-                    style={styles.eyeButton}
+                    className="auth-eye-button"
+                    whileHover={{ scale: 1.1 }}
+                    whileTap={{ scale: 0.9 }}
                   >
-                    {showPassword ? <FiEyeOff /> : <FiEye />}
-                  </button>
+                    <AnimatePresence mode="wait">
+                      <motion.div
+                        key={showPassword ? "visible" : "hidden"}
+                        initial={{ opacity: 0, rotate: -90 }}
+                        animate={{ opacity: 1, rotate: 0 }}
+                        exit={{ opacity: 0, rotate: 90 }}
+                        transition={{ duration: 0.2 }}
+                      >
+                        {showPassword ? (
+                          <EyeOff size={18} />
+                        ) : (
+                          <Eye size={18} />
+                        )}
+                      </motion.div>
+                    </AnimatePresence>
+                  </motion.button>
                 </div>
               </motion.div>
 
               <motion.button
                 type="submit"
                 disabled={loading}
-                style={{
-                  ...styles.submitBtn,
-                  ...(loading ? styles.submitBtnDisabled : {}),
-                }}
-                whileHover={!loading ? { scale: 1.02 } : {}}
+                className={`auth-submit-btn ${loading ? "auth-submit-btn-disabled" : ""}`}
+                whileHover={!loading ? { scale: 1.02, y: -2 } : {}}
                 whileTap={!loading ? { scale: 0.98 } : {}}
                 initial={{ y: 20, opacity: 0 }}
-                animate={{ y: 0, opacity: 1 }}
-                transition={{ duration: 0.4, delay: 0.8 }}
+                animate={{
+                  y: 0,
+                  opacity: 1,
+                  background:
+                    userRole === "employer"
+                      ? "linear-gradient(135deg, #0ea5e9 0%, #6366f1 100%)"
+                      : "linear-gradient(135deg, #10b981 0%, #0ea5e9 100%)",
+                }}
+                transition={{ duration: 0.4, delay: 0.5 }}
               >
                 {loading ? (
                   <>
                     <motion.div
-                      style={styles.spinner}
+                      className="auth-spinner"
                       animate={{ rotate: 360 }}
                       transition={{
                         duration: 1,
-                        repeat: Infinity,
+                        repeat: Number.POSITIVE_INFINITY,
                         ease: "linear",
                       }}
                     />
                     Processing...
                   </>
-                ) : isLogin ? (
-                  `Sign In as ${userRole === "employer" ? "Employer" : "Job Seeker"}`
                 ) : (
-                  "Create Account"
+                  <AnimatePresence mode="wait">
+                    <motion.span
+                      key={`btn-${isLogin}-${userRole}`}
+                      initial={{ opacity: 0, y: 10 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      exit={{ opacity: 0, y: -10 }}
+                      transition={{ duration: 0.2 }}
+                    >
+                      {isLogin
+                        ? `Sign In as ${userRole === "employer" ? "Employer" : "Job Seeker"}`
+                        : "Create Account"}
+                    </motion.span>
+                  </AnimatePresence>
                 )}
               </motion.button>
             </form>
 
             {/* Switch Auth Mode */}
             <motion.p
-              style={styles.switchText}
+              className="auth-switch-text"
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
-              transition={{ duration: 0.5, delay: 0.9 }}
+              transition={{ duration: 0.5, delay: 0.6 }}
             >
               {isLogin
                 ? "Don't have an account? "
@@ -289,8 +465,12 @@ const Auth = () => {
                   setIsLogin(!isLogin);
                   setError("");
                 }}
-                style={styles.switchLink}
+                className="auth-switch-link"
                 whileHover={{ scale: 1.05 }}
+                whileTap={{ scale: 0.95 }}
+                style={{
+                  color: currentRole.accentColor,
+                }}
               >
                 {isLogin ? "Sign Up" : "Sign In"}
               </motion.span>
@@ -301,257 +481,5 @@ const Auth = () => {
     </div>
   );
 };
-
-const styles = {
-  container: {
-    minHeight: "100vh",
-    display: "flex",
-    alignItems: "center",
-    justifyContent: "center",
-    padding: "2rem 1rem",
-    background: "linear-gradient(135deg, #F9FAFB 0%, #EEF2FF 100%)",
-  },
-  wrapper: {
-    display: "grid",
-    gridTemplateColumns: "1fr 1fr",
-    maxWidth: "1100px",
-    width: "100%",
-    backgroundColor: "white",
-    borderRadius: "1.5rem",
-    overflow: "hidden",
-    boxShadow: "0 20px 60px rgba(0,0,0,0.1)",
-  },
-  brandingSide: {
-    background: "linear-gradient(135deg, #4F46E5 0%, #7C3AED 100%)",
-    padding: "4rem 3rem",
-    display: "flex",
-    alignItems: "center",
-    justifyContent: "center",
-    color: "white",
-  },
-  brandingContent: {
-    maxWidth: "400px",
-  },
-  logoSection: {
-    textAlign: "center",
-    marginBottom: "3rem",
-  },
-  largeLogo: {
-    width: "80px",
-    height: "80px",
-    margin: "0 auto 1.5rem",
-    display: "flex",
-    alignItems: "center",
-    justifyContent: "center",
-    fontSize: "2.5rem",
-    backgroundColor: "rgba(255, 255, 255, 0.2)",
-    borderRadius: "1.5rem",
-    backdropFilter: "blur(10px)",
-  },
-  brandTitle: {
-    fontSize: "2.5rem",
-    fontWeight: "800",
-    marginBottom: "0.5rem",
-  },
-  brandSubtitle: {
-    fontSize: "1.125rem",
-    lineHeight: "1.7",
-    opacity: 0.95,
-    marginBottom: "3rem",
-  },
-  features: {
-    display: "flex",
-    flexDirection: "column",
-    gap: "1.25rem",
-  },
-  featureItem: {
-    display: "flex",
-    alignItems: "center",
-    gap: "1rem",
-    fontSize: "1rem",
-  },
-  checkIcon: {
-    width: "24px",
-    height: "24px",
-    display: "flex",
-    alignItems: "center",
-    justifyContent: "center",
-    backgroundColor: "rgba(255, 255, 255, 0.2)",
-    borderRadius: "50%",
-    fontWeight: "bold",
-  },
-  formSide: {
-    padding: "4rem 3rem",
-    display: "flex",
-    alignItems: "center",
-  },
-  formContainer: {
-    width: "100%",
-    maxWidth: "400px",
-    margin: "0 auto",
-  },
-  formTitle: {
-    fontSize: "2rem",
-    fontWeight: "800",
-    marginBottom: "0.5rem",
-    color: "#111827",
-  },
-  formSubtitle: {
-    fontSize: "1rem",
-    color: "#6B7280",
-    marginBottom: "2rem",
-  },
-  tabContainer: {
-    display: "grid",
-    gridTemplateColumns: "1fr 1fr",
-    gap: "0.75rem",
-    marginBottom: "2rem",
-    padding: "0.5rem",
-    backgroundColor: "#F3F4F6",
-    borderRadius: "0.75rem",
-  },
-  tab: {
-    display: "flex",
-    alignItems: "center",
-    justifyContent: "center",
-    gap: "0.5rem",
-    padding: "0.75rem 1rem",
-    backgroundColor: "transparent",
-    border: "none",
-    borderRadius: "0.5rem",
-    fontSize: "0.95rem",
-    fontWeight: "600",
-    color: "#6B7280",
-    cursor: "pointer",
-    transition: "all 0.2s ease",
-  },
-  activeTab: {
-    backgroundColor: "white",
-    color: "#4F46E5",
-    boxShadow: "0 2px 4px rgba(0,0,0,0.05)",
-  },
-  tabIcon: {
-    fontSize: "1.125rem",
-  },
-  errorBox: {
-    display: "flex",
-    alignItems: "center",
-    gap: "0.75rem",
-    padding: "1rem",
-    backgroundColor: "#FEE2E2",
-    color: "#DC2626",
-    borderRadius: "0.75rem",
-    fontSize: "0.875rem",
-    marginBottom: "1.5rem",
-    border: "1px solid #FCA5A5",
-  },
-  errorIcon: {
-    fontSize: "1.25rem",
-    flexShrink: 0,
-  },
-  form: {
-    display: "flex",
-    flexDirection: "column",
-    gap: "1.5rem",
-  },
-  inputGroup: {
-    display: "flex",
-    flexDirection: "column",
-    gap: "0.5rem",
-  },
-  label: {
-    fontSize: "0.875rem",
-    fontWeight: "600",
-    color: "#374151",
-  },
-  inputWrapper: {
-    position: "relative",
-    display: "flex",
-    alignItems: "center",
-  },
-  inputIcon: {
-    position: "absolute",
-    left: "1rem",
-    fontSize: "1.125rem",
-    color: "#9CA3AF",
-  },
-  input: {
-    width: "100%",
-    padding: "0.875rem 1rem 0.875rem 3rem",
-    border: "2px solid #E5E7EB",
-    borderRadius: "0.75rem",
-    fontSize: "1rem",
-    transition: "all 0.2s ease",
-    backgroundColor: "white",
-  },
-  eyeButton: {
-    position: "absolute",
-    right: "1rem",
-    padding: "0.5rem",
-    backgroundColor: "transparent",
-    border: "none",
-    color: "#9CA3AF",
-    cursor: "pointer",
-    fontSize: "1.125rem",
-    display: "flex",
-    alignItems: "center",
-  },
-  submitBtn: {
-    display: "flex",
-    alignItems: "center",
-    justifyContent: "center",
-    gap: "0.5rem",
-    padding: "1rem",
-    fontSize: "1rem",
-    fontWeight: "600",
-    color: "white",
-    background: "linear-gradient(135deg, #4F46E5 0%, #7C3AED 100%)",
-    border: "none",
-    borderRadius: "0.75rem",
-    cursor: "pointer",
-    marginTop: "0.5rem",
-    boxShadow: "0 4px 12px rgba(79, 70, 229, 0.3)",
-    transition: "all 0.2s ease",
-  },
-  submitBtnDisabled: {
-    opacity: 0.7,
-    cursor: "not-allowed",
-  },
-  spinner: {
-    width: "20px",
-    height: "20px",
-    border: "3px solid rgba(255,255,255,0.3)",
-    borderTop: "3px solid white",
-    borderRadius: "50%",
-  },
-  switchText: {
-    textAlign: "center",
-    fontSize: "0.95rem",
-    color: "#6B7280",
-    marginTop: "1.5rem",
-  },
-  switchLink: {
-    color: "#4F46E5",
-    fontWeight: "600",
-    cursor: "pointer",
-    display: "inline-block",
-  },
-};
-
-// Responsive styles
-if (typeof window !== "undefined") {
-  const style = document.createElement("style");
-  style.textContent = `
-    @media (max-width: 968px) {
-      .wrapper {
-        grid-template-columns: 1fr !important;
-      }
-      .brandingSide {
-        display: none !important;
-      }
-    }
-  `;
-  document.head.appendChild(style);
-}
 
 export default Auth;
