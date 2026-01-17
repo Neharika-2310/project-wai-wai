@@ -271,26 +271,32 @@ const JobDashboard = () => {
                 <option value="date">Newest First</option>
               </select>
 
-              <div className="job-view-toggle">
-                <button
-                  onClick={() => setViewMode("grid")}
-                  className={
-                    viewMode === "grid" ? "job-icon-btn-active" : "job-icon-btn"
-                  }
-                  aria-label="Grid view"
-                >
-                  <FiGrid />
-                </button>
-                <button
-                  onClick={() => setViewMode("list")}
-                  className={
-                    viewMode === "list" ? "job-icon-btn-active" : "job-icon-btn"
-                  }
-                  aria-label="List view"
-                >
-                  <FiList />
-                </button>
-              </div>
+              {!isMobile && (
+                <div className="job-view-toggle">
+                  <button
+                    onClick={() => setViewMode("grid")}
+                    className={
+                      viewMode === "grid"
+                        ? "job-icon-btn-active"
+                        : "job-icon-btn"
+                    }
+                    aria-label="Grid view"
+                  >
+                    <FiGrid />
+                  </button>
+                  <button
+                    onClick={() => setViewMode("list")}
+                    className={
+                      viewMode === "list"
+                        ? "job-icon-btn-active"
+                        : "job-icon-btn"
+                    }
+                    aria-label="List view"
+                  >
+                    <FiList />
+                  </button>
+                </div>
+              )}
             </div>
           </div>
 
@@ -307,7 +313,14 @@ const JobDashboard = () => {
             </p>
           </div>
 
-          <div className={viewMode === "grid" ? "job-grid" : "job-list"}>
+          {/** Enforce list view on mobile */}
+          <div
+            className={
+              (isMobile ? "list" : viewMode) === "grid"
+                ? "job-grid"
+                : "job-list"
+            }
+          >
             {displayedJobs.length > 0 ? (
               displayedJobs.map((job) => <JobCard key={job.id} job={job} />)
             ) : (
