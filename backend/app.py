@@ -40,7 +40,7 @@ def create_app():
         [Job Title] at [Company Placeholder]
         
         About the Role:
-        [2-3 paragraph description]
+        [1 paragraph description]
         
         Key Responsibilities:
         - [5-7 bullet points based on {level} level and {skills}]
