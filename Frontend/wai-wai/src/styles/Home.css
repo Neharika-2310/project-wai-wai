@@ -1,117 +1,181 @@
-/* frontend/wai-wai/src/styles/Home.css */
+/* Home Page Styles */
 .home-container {
   min-height: 100vh;
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-  padding: 2rem;
+  background: linear-gradient(
+    135deg,
+    var(--color-primary-50) 0%,
+    var(--color-gray-100) 100%
+  );
+  padding: 0;
+  display: flex;
+  flex-direction: column;
 }
 
+/* Hero Section */
 .hero-section {
   text-align: center;
-  padding: 4rem 2rem;
-  color: white;
+  padding: var(--space-24) var(--space-6);
+  color: var(--color-gray-900);
+  background: linear-gradient(
+    135deg,
+    var(--color-white) 0%,
+    var(--color-primary-50) 100%
+  );
+  border-bottom: 1px solid var(--color-gray-200);
 }
 
 .hero-title {
-  font-size: 3.5rem;
-  font-weight: 700;
-  margin-bottom: 1rem;
+  font-size: clamp(2rem, 6vw, 3.5rem);
+  font-weight: 800;
+  margin-bottom: var(--space-6);
+  color: var(--color-gray-900);
+  letter-spacing: -0.03em;
   animation: fadeInDown 0.8s ease-out;
 }
 
 .hero-subtitle {
-  font-size: 1.5rem;
-  opacity: 0.9;
-  margin-bottom: 2rem;
+  font-size: clamp(1rem, 3vw, 1.25rem);
+  opacity: 0.85;
+  color: var(--color-gray-700);
+  margin-bottom: var(--space-8);
   animation: fadeInUp 0.8s ease-out;
+  max-width: 600px;
+  margin-left: auto;
+  margin-right: auto;
 }
 
-.cta-button {
-  background: white;
-  color: #667eea;
+.hero-section .cta-button {
+  background: linear-gradient(
+    135deg,
+    var(--color-primary-600) 0%,
+    var(--color-secondary-600) 100%
+  );
+  color: white;
   border: none;
-  padding: 1rem 3rem;
-  font-size: 1.2rem;
+  padding: var(--space-4) var(--space-8);
+  font-size: 1.125rem;
   font-weight: 600;
-  border-radius: 50px;
+  border-radius: var(--radius-lg);
   cursor: pointer;
   transition: all 0.3s ease;
-  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+  box-shadow: var(--shadow-lg);
+  display: inline-block;
+  text-decoration: none;
 }
 
-.cta-button:hover {
-  transform: translateY(-3px);
-  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.3);
+.hero-section .cta-button:hover {
+  transform: translateY(-4px);
+  box-shadow: var(--shadow-xl);
 }
 
+/* Features Section */
 .features-section {
-  max-width: 1200px;
+  max-width: var(--container-2xl);
   margin: 0 auto;
-  padding: 3rem 1rem;
+  padding: var(--space-20) var(--space-6);
+  width: 100%;
 }
 
 .features-title {
   text-align: center;
-  font-size: 2.5rem;
-  color: white;
-  margin-bottom: 3rem;
-  font-weight: 600;
+  font-size: clamp(1.75rem, 4vw, 2.5rem);
+  color: var(--color-gray-900);
+  margin-bottom: var(--space-16);
+  font-weight: 700;
+  letter-spacing: -0.02em;
 }
 
 .features-grid {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-  gap: 2rem;
+  gap: var(--space-6);
 }
 
 .feature-card {
-  background: white;
-  border-radius: 16px;
-  padding: 2rem;
+  background: var(--color-white);
+  border-radius: var(--radius-lg);
+  padding: var(--space-8);
   text-align: center;
   cursor: pointer;
   transition: all 0.3s ease;
-  border: 3px solid transparent;
-  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  border: 2px solid var(--color-gray-200);
+  box-shadow: var(--shadow-md);
   position: relative;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+}
+
+.feature-card::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 4px;
+  background: linear-gradient(
+    90deg,
+    var(--color-primary-600),
+    var(--color-secondary-600)
+  );
+  transform: scaleX(0);
+  transform-origin: left;
+  transition: transform 0.3s ease;
 }
 
 .feature-card:hover {
   transform: translateY(-8px);
-  box-shadow: 0 12px 24px rgba(0, 0, 0, 0.15);
+  box-shadow: var(--shadow-xl);
+  border-color: var(--color-primary-300);
+}
+
+.feature-card:hover::before {
+  transform: scaleX(1);
 }
 
 .feature-icon {
-  margin-bottom: 1rem;
+  margin-bottom: var(--space-4);
   display: flex;
   justify-content: center;
   align-items: center;
+  font-size: 3rem;
+  color: currentColor;
 }
 
 .feature-title {
-  font-size: 1.5rem;
-  font-weight: 600;
-  margin-bottom: 0.75rem;
-  color: #1f2937;
+  font-size: 1.25rem;
+  font-weight: 700;
+  margin-bottom: var(--space-3);
+  color: var(--color-gray-900);
+  letter-spacing: -0.01em;
 }
 
 .feature-description {
-  font-size: 1rem;
-  color: #6b7280;
-  line-height: 1.6;
-  margin-bottom: 1rem;
+  font-size: 0.95rem;
+  color: var(--color-gray-600);
+  line-height: var(--leading-relaxed);
+  margin-bottom: var(--space-4);
+  flex: 1;
 }
 
 .feature-lock {
   display: inline-block;
-  font-size: 0.85rem;
-  color: #9ca3af;
+  font-size: 0.8rem;
+  color: var(--color-gray-600);
   font-weight: 500;
-  padding: 0.5rem 1rem;
-  background: #f3f4f6;
-  border-radius: 20px;
-  margin-top: 0.5rem;
+  padding: var(--space-2) var(--space-4);
+  background: var(--color-gray-100);
+  border-radius: var(--radius-full);
+  margin-top: auto;
+  transition: all 0.2s ease;
 }
 
+.feature-card:hover .feature-lock {
+  background: var(--color-primary-100);
+  color: var(--color-primary-700);
+}
+
+/* Animations */
 @keyframes fadeInDown {
   from {
     opacity: 0;
@@ -135,21 +199,74 @@
 }
 
 /* Responsive Design */
+@media (max-width: 1024px) {
+  .features-section {
+    padding: var(--space-16) var(--space-6);
+  }
+
+  .features-grid {
+    grid-template-columns: repeat(2, 1fr);
+    gap: var(--space-5);
+  }
+}
+
 @media (max-width: 768px) {
+  .hero-section {
+    padding: var(--space-16) var(--space-4);
+  }
+
   .hero-title {
-    font-size: 2.5rem;
+    font-size: 2rem;
+    margin-bottom: var(--space-4);
   }
 
   .hero-subtitle {
-    font-size: 1.2rem;
+    font-size: 1rem;
+    margin-bottom: var(--space-6);
+  }
+
+  .hero-section .cta-button {
+    padding: var(--space-3) var(--space-6);
+    font-size: 1rem;
+  }
+
+  .features-section {
+    padding: var(--space-12) var(--space-4);
   }
 
   .features-grid {
     grid-template-columns: 1fr;
-    gap: 1.5rem;
+    gap: var(--space-4);
   }
 
   .features-title {
+    font-size: 1.75rem;
+    margin-bottom: var(--space-8);
+  }
+
+  .feature-card {
+    padding: var(--space-6);
+  }
+}
+
+@media (max-width: 480px) {
+  .hero-section {
+    padding: var(--space-12) var(--space-4);
+  }
+
+  .hero-title {
+    font-size: 1.5rem;
+  }
+
+  .features-section {
+    padding: var(--space-8) var(--space-4);
+  }
+
+  .feature-card {
+    padding: var(--space-4);
+  }
+
+  .feature-icon {
     font-size: 2rem;
   }
 }
