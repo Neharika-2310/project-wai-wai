@@ -43,6 +43,15 @@ const Navbar = () => {
 
   const navLinks = [
     { path: "/", label: "Home", icon: <FiHome /> },
+    ...(user?.user_metadata?.role === "candidate"
+      ? [
+          {
+            path: "/jobs",
+            label: "Job Discovery",
+            icon: <FiBriefcase />,
+          },
+        ]
+      : []),
     ...(user?.user_metadata?.role === "employer"
       ? [
           {
