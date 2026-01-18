@@ -16,7 +16,7 @@ import {
   FileText,
   Users,
 } from "lucide-react";
-import "../styles/auth-page.css";
+import "./auth-page.css";
 
 const Auth = () => {
   const { login, register } = useAuth();
