@@ -3,12 +3,12 @@ import { createRoot } from 'react-dom/client'
 import App from './App.jsx'
 
 // =======================================================
-// 1. FOUNDATION STYLES (CRITICAL: Must load first)
+// 1. FOUNDATION STYLES (CRITICAL: Must load FIRST)
 // =======================================================
 import './index.css' 
-import './styles/variables.css'       // Defines colors & spacing (Fixes distortion)
-import './styles/globals.css'         // Base resets
-import './styles/design-system.css'   // Shared buttons & inputs
+import './styles/variables.css'       // <--- FIXES DISTORTION (Defines spacing/colors)
+import './styles/globals.css'         // <--- FIXES LAYOUT (Base resets)
+import './styles/design-system.css'   // <--- FIXES BUTTONS/INPUTS
 import './responsive.css'             // Global media queries (Located in src/)
 
 // =======================================================
@@ -16,7 +16,8 @@ import './responsive.css'             // Global media queries (Located in src/)
 // =======================================================
 import './styles/auth-global.css'           
 import './styles/navbar-global.css'         
-import './styles/footer-global.css'         
+import './styles/footer-global.css'
+import './styles/Footer-responsive.css' // <--- Added (Note the Capital 'F')
 
 // =======================================================
 // 3. PAGE SPECIFIC STYLES
